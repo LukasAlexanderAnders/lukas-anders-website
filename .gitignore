@@ -1,0 +1,14 @@
+# Systemdateien
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editor-Einstellungen
+.vscode/
+
+# Nicht benötigte Dateien
+signature*.png
+gitarre_dezent.png
+*.pdf
+Lukas_*.jpg
+entwuerfe/

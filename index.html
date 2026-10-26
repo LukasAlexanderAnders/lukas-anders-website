@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dr. Lukas Anders | Physicist</title>
+  <meta name="description" content="Dr. Lukas Anders is a physicist from Rostock working on LLM evaluation and data analysis, with a background in laser instrumentation and mass spectrometry.">
+  <meta property="og:title" content="Dr. Lukas Anders | Physicist">
+  <meta property="og:description" content="A letter from Lukas Alexander Anders – physicist, from lasers and ship exhaust to language models.">
+  <!-- Nach dem Hochladen durch die vollständige Adresse ersetzen, z. B. https://ihre-domain.de/portrait.jpg – sonst zeigen LinkedIn & Co. beim Teilen kein Bild -->
+  <meta property="og:image" content="https://lukasanders.com/portrait.jpg">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <!-- Schrift lokal eingebunden (Ordner "fonts"), damit beim Seitenaufruf keine Daten an Google übertragen werden -->
+  <link rel="preload" href="fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    @font-face {
+      font-family: "Newsreader"; font-style: normal; font-weight: 200 800; font-display: swap;
+      src: url("fonts/newsreader.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "Newsreader"; font-style: italic; font-weight: 200 800; font-display: swap;
+      src: url("fonts/newsreader-italic.woff2") format("woff2");
+    }
+    :root {
+      --paper: #F8F4ED;   /* sehr helles, weiches Beige */
+      --ink: #24221F;
+      --muted: #716C64;
+      --rule: #E7E0D4;
+      --accent: #2F6B4F;   /* dunkles Laborgrün, nur für Links und das aktive Kapitel */
+      --ink-signature: #12294F;   /* Mitternachtsblau */
+      --measure: 34rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #15181C;
+        --ink: #E6E8EB;
+        --muted: #9AA0A9;
+        --rule: #2A2F35;
+        --accent: #7FC3A0;
+      }
+      :root { --ink-signature: #A9C1E8; }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Newsreader", Georgia, "Times New Roman", serif;
+      font-size: 1.1875rem;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-underline-offset: 0.18em; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+    .skip { position: absolute; left: -999px; }
+    .skip:focus { left: 1rem; top: 1rem; background: var(--paper); padding: .4rem .7rem; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr minmax(0, var(--measure)) 1fr;
+      gap: 0 3rem;
+      padding: 0 1.5rem;
+    }
+    main { grid-column: 2; padding: 6rem 0 5rem; }
+
+    h1 {
+      font-weight: 400;
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      margin: 0 0 2.5rem;
+    }
+    h2 {
+      font-weight: 500;
+      font-size: 1.35rem;
+      margin: 3.5rem 0 1rem;
+      scroll-margin-top: 2rem;
+    }
+    p { margin: 0 0 1.15rem; }
+
+    figure { margin: 0 0 2.5rem; }
+    figure img { display: block; width: 100%; height: auto; border-radius: 2px; }
+    figcaption { margin-top: .6rem; font-size: .875rem; color: var(--muted); }
+    figcaption span, .caption span { font-style: italic; }
+    .portrait { margin-bottom: .6rem; }
+    .caption { margin: 0 0 2.5rem; font-size: .875rem; color: var(--muted); }
+
+    figure.object { max-width: 15rem; margin: 2rem auto 2.5rem; }
+    figure.object img { border-radius: 0; }
+    figure.object figcaption { text-align: center; }
+
+    .closing { margin-top: 3.5rem; }
+    /* Unterschrift: Striche werden nacheinander gezeichnet, sobald sie sichtbar wird */
+    .signature { display: block; width: 190px; max-width: 55%; height: auto; margin: 1.2rem 0 .6rem; overflow: visible; }
+    .signature path {
+      fill: none; stroke: var(--ink-signature);
+      stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 1; stroke-dashoffset: 1;
+    }
+    .signature.is-written path { animation: write var(--dur) linear var(--delay) forwards; }
+    @keyframes write { to { stroke-dashoffset: 0; } }
+
+    /* Porträt: sanftes Einblenden beim Laden und leichte Parallaxe beim Scrollen */
+    .portrait { overflow: hidden; border-radius: 2px; }
+    .portrait img {
+      opacity: 0; transform: scale(1.06); filter: blur(6px);
+      transition: opacity 1.2s ease, transform 1.6s cubic-bezier(.2,.7,.2,1), filter 1.2s ease;
+      will-change: transform;
+    }
+    .portrait.is-loaded img { opacity: 1; transform: scale(1.06) translateY(var(--shift, 0px)); filter: none; }
+
+    /* Porträt: neigt sich beim Überfahren mit der Maus leicht zum Cursor, mit weichem Lichtreflex */
+    .portrait {
+      position: relative;
+      transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+      transition: transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .6s ease;
+    }
+    .portrait::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,255,255,.22), transparent 55%);
+      opacity: 0; transition: opacity .5s ease;
+    }
+    .portrait.is-hover { transition: transform .15s ease-out, box-shadow .6s ease; box-shadow: 0 18px 40px -22px rgba(40,30,20,.45); }
+    .portrait.is-hover::after { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) {
+      .signature path { stroke-dashoffset: 0; }
+      .signature.is-written path { animation: none; }
+      .portrait img, .portrait.is-loaded img { opacity: 1; transform: none; filter: none; transition: none; }
+      .portrait { transform: none; transition: none; }
+      .portrait::after { display: none; }
+    }
+    .place { color: var(--muted); font-size: 1rem; }
+
+    .contact {
+      margin-top: 3.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--rule);
+      font-size: 1rem;
+    }
+    .contact ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .4rem 1.6rem; }
+    /* Credits: kleiner und zentriert, wie ein Abspann */
+    .credits { margin: 4.5rem auto 0; max-width: 26rem; text-align: center; font-size: .95rem; line-height: 1.6; color: var(--muted); }
+    .credits h2 { font-size: 1.05rem; color: var(--ink); margin-bottom: 1.2rem; }
+    .credits p { margin: 0 0 .8rem; }
+    footer { margin-top: 3rem; font-size: .875rem; color: var(--muted); }
+
+    /* Kapitelübersicht: nur auf breiten Bildschirmen, klebt am Rand */
+    nav.chapters { grid-column: 3; display: none; }
+    @media (min-width: 1100px) {
+      nav.chapters { display: block; }
+      nav.chapters ol {
+        position: sticky; top: 6rem;
+        list-style: none; padding: 0; margin: 6rem 0 0;
+        font-size: .9rem; line-height: 1.5;
+        counter-reset: ch;
+      }
+      nav.chapters li { counter-increment: ch; margin-bottom: .35rem; }
+      nav.chapters a { color: var(--muted); text-decoration: none; }
+      nav.chapters a::before {
+        content: counter(ch, decimal-leading-zero) "  ";
+        font-variant-numeric: tabular-nums;
+        opacity: .6;
+      }
+      nav.chapters a:hover, nav.chapters a[aria-current="true"] { color: var(--ink); }
+      nav.chapters a[aria-current="true"]::before { color: var(--accent); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="layout">
+    <main id="main">
+      <h1 id="top">A letter from Lukas Anders</h1>
+
+      <!-- Ihr Porträt: Datei "portrait.jpg" (1080 × 1350 px, Hochformat 4:5) im selben Ordner -->
+      <figure class="portrait">
+        <img src="portrait.jpg" alt="Lukas Anders in front of an old brick wall, smiling and looking into the distance" width="1080" height="1350">
+      </figure>
+      <p class="caption">Lukas Anders <span>· Photo by Paula Bülow</span></p>
+
+      <section>
+        <p>I grew up in Itzehoe with three grandmothers, two sisters and a huge family of aunts, uncles and cousins – that’s more than most people get, and I’m incredibly grateful for it. This close-knit family shaped my sense of solidarity and loyalty, and it taught me early on to recognise what is worth putting my energy into.</p>
+        <p>We played a lot of strategy board games as a family. They gave me an early love of thinking several moves ahead, a good deal of patience, and the understanding that losing a game is a lesson in itself: a chance to grow and to do better next time.</p>
+        <p>Ever since seventh grade, I’ve been fascinated by physics, maths and complex problems. My physics teacher at the time taught us that curiosity and hard work go hand in hand. My grandmothers taught me the other side of the coin: that calm, and even boredom, can lead to the greatest creativity. Both carried me through school, which I finished in 2013 with the best results in the science stream. More importantly, this mindset helped me find people who look at the world with the same enthusiasm.</p>
+      </section>
+
+      <section>
+        <h2 id="physics">Studying physics</h2>
+        <p>This curiosity took me to Rostock to study physics, where I quickly realised how much more there was to learn. The first semesters opened up a wide range of subjects and fuelled my ambition to understand them properly, and being surrounded by ambitious people kept me moving forward. During this time I made some of my best friends, partly through my work on the Physics Students’ Council. To this day, we are bound together by our shared experience of studying physics and plenty of unforgettable memories.</p>
+        <p>As the semesters went by, my view of the world kept widening. I took full advantage of the university and attended courses in physics, mathematics, medicine, chemistry, biology, Spanish and history. I loved carrying ideas from one subject into another, or simply trying something new.</p>
+        <p>After a Bachelor’s thesis in theoretical quantum optics, I chose an interdisciplinary Master’s thesis with the Department of Ophthalmology at Rostock University Medical Centre. There I developed and characterised a Brillouin measurement setup and used it to study eye lenses ex vivo. The experiment had plenty of setbacks, and I kept having to come up with creative solutions until, by the end of my Master’s, it worked. That experience convinced me to take on a new challenge: a PhD in chemistry, in a field where physics meets environmental and climate research and human health.</p>
+        <p>Not every chapter of those years was easy. Some of the hardest moments taught me what really matters, and to make the most of the time I have.</p>
+      </section>
+
+      <section>
+        <h2 id="phd">Ship emissions and machine learning</h2>
+        <p>When I started my PhD, I had a background in optics and quantum physics and very little idea what comes out of a ship’s chimney. The question sounded simple: if you catch a single particle from the exhaust, can you tell which fuel it came from? Answering it took the better part of five years.</p>
+        <p>Our instrument was a laser-based mass spectrometer that analyses particles one by one, thousands of them per hour, in high vacuum. It is a remarkable machine, and it is also temperamental. I learned to calibrate it, to design new parts for it and follow them through the workshop, and to repair it on site. During a measurement campaign in Kuopio, Finland, one of the lasers failed halfway through. I had to completely rethink the trigger system to get the setup running again. It took the whole night, but by morning it worked.</p>
+        <p>The campaigns also took me to a research engine in Rostock and to the DHL hub in Leipzig, where we tested whether the same method could detect hazardous substances in shipments. Afterwards came the part nobody photographs: making sense of the data. A single campaign produces far more spectra than anyone could look at by hand, so I wrote Python and MATLAB code that used machine-learning algorithms (k-means, ART-2a and DBSCAN) to sort the particles into groups with similar chemical signatures and to work out which features set one fuel apart from another. For my data, ART-2a turned out to work best. The hardest part was rarely the algorithm itself. It was checking whether a pattern the model found was real chemistry or just an artefact of the instrument.</p>
+        <p>Two results still make me glad I stayed with it. We found patterns in the particles that reveal which fuel a ship is burning, and we used them to pick out the plume of a single passing ship from 15 to 20 kilometres away. We also showed that the wet scrubbers many ships now use remove sulphur, but leave most of the finest particles in the air.</p>
+        <p>The work ended in a doctorate and five papers. What I took with me goes beyond ships. A PhD teaches you to manage your time, to find your way between different interests and opinions, and to tell essential priorities from non-essential ones through trial and error. Most of all, I saw how much a united team can achieve when everyone works towards the same goal.</p>
+      </section>
+
+      <section>
+        <h2 id="ai">Measuring language models</h2>
+        <p>At MIMIR in Tübingen I turned the same habits to a new question: which language model should handle which task, once cost, response time and data protection count? The most capable model is not always the right choice, and the cheapest one is not always good enough.</p>
+        <p>I built a benchmarking framework in Python that gives realistic business tasks to four commercial and open-source models: procurement decisions for an electric vehicle fleet and for software licences, proofreading a CV, and translating a text into ten languages. Rule-based pre-scoring and a structured record of every run make the results comparable and reproducible. Alongside it, I designed a taxonomy that describes each task by the capabilities and operational requirements a model needs, as the basis for an intelligent router.</p>
+        <p>Much of it felt familiar. Models, like instruments, rarely behave exactly as the documentation suggests, and a good comparison depends less on the tools than on asking the right question and checking the answer honestly.</p>
+      </section>
+
+      <section>
+        <h2 id="music">Silence and sound</h2>
+        <p>I started with classical guitar in 2007, and the guitar has come with me through school, university and my PhD. Today I mostly play a steel-string acoustic.</p>
+        <p>When I’m stuck on a problem, I often put it aside and play for a few minutes. More often than I can explain, that is when the solution turns up. My grandmothers would probably call it the useful kind of boredom.</p>
+        <p>Most of the time I improvise rather than play pieces from start to finish. One exception is “Ocean” by John Butler, which I keep coming back to.</p>
+        <p>Whenever I play, my head gets a little quieter, and usually a little clearer.</p>
+        <!-- Freigestellte Gitarre mit weichem Schatten, transparenter Hintergrund (passt auf jeden Seitenhintergrund) -->
+        <figure class="object">
+          <img src="gitarre.png" alt="My acoustic guitar with its brown suede strap and capo" width="605" height="1506">
+          <figcaption>Playing since 2007</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <h2 id="next">What comes next</h2>
+        <p>I’m looking for a new challenge that combines the things I’m most interested in: artificial intelligence, new ideas that transform existing practices, and protecting the environment and climate. I also enjoy the process of developing an idea further, thinking a few steps ahead about what it could mean and finding an approach that nobody has tried yet when the obvious one doesn’t work.</p>
+        <p>After many years in the laboratory, I am ready to apply my knowledge in the real world. I want my work to benefit people and the environment we share, and I’d like to help good new ideas get off the ground, whether they are my own or someone else's.</p>
+        <p>There is still a lot I want to learn, and I enjoy doing so in good company: with people who ask questions, disagree openly, and share what they know. If that sounds like your team, or if you simply want to exchange ideas, I’d be glad to hear from you.        </p>
+      </section>
+
+      <div class="closing">
+        <p>If you’ve made it this far, thank you for taking the time to get to know me.</p>
+        <p>I hope our paths cross one day.</p>
+        <!-- Unterschrift als Vektor (um 90° gegen den Uhrzeigersinn gedreht): erst das L in einem Zug, dann das A in einem Zug -->
+        <svg class="signature" viewBox="0 0 1180 1122" role="img" aria-label="Signature of Lukas Anders" stroke-width="10.0">
+          <path class="letter-l" d="M656.0 192.0 L658.0 185.0 L664.0 177.0 L671.0 160.0 L688.0 132.0 L702.0 117.0 L734.0 89.0 L740.0 86.0 L755.0 74.0 L766.0 69.0 L770.0 69.0 L777.0 65.0 L780.0 65.0 L783.0 63.0 L794.0 62.0 L806.0 58.0 L811.0 58.0 L817.0 56.0 L825.0 56.0 L832.0 54.0 L871.0 54.0 L877.0 56.0 L884.0 56.0 L889.0 58.0 L893.0 58.0 L901.0 61.0 L905.0 61.0 L918.0 66.0 L921.0 66.0 L926.0 69.0 L930.0 69.0 L933.0 71.0 L939.0 72.0 L949.0 76.0 L965.0 85.0 L973.0 88.0 L975.0 90.0 L977.0 90.0 L985.0 97.0 L996.0 104.0 L1013.0 121.0 L1023.0 133.0 L1036.0 152.0 L1037.0 156.0 L1043.0 165.0 L1045.0 172.0 L1048.0 175.0 L1050.0 182.0 L1052.0 184.0 L1060.0 208.0 L1060.0 213.0 L1064.0 222.0 L1065.0 240.0 L1068.0 253.0 L1068.0 274.0 L1069.0 275.0 L1068.0 300.0 L1066.0 308.0 L1066.0 315.0 L1064.0 320.0 L1064.0 324.0 L1062.0 327.0 L1062.0 333.0 L1057.0 349.0 L1057.0 354.0 L1053.0 362.0 L1046.0 387.0 L1044.0 389.0 L1044.0 392.0 L1036.0 409.0 L1036.0 412.0 L1033.0 419.0 L1028.0 428.0 L1026.0 435.0 L1022.0 442.0 L1019.0 452.0 L1006.0 471.0 L999.0 485.0 L956.0 543.0 L915.0 585.0 L913.0 589.0 L881.0 621.0 L861.0 638.0 L848.0 643.0 L847.0 644.0 L847.0 652.0 L845.0 655.0 L838.0 657.0 L833.0 662.0 L831.0 662.0 L826.0 667.0 L810.0 678.0 L804.0 684.0 L788.0 694.0 L759.0 717.0 L750.0 722.0 L739.0 731.0 L727.0 738.0 L723.0 742.0 L712.0 748.0 L699.0 758.0 L687.0 765.0 L683.0 769.0 L680.0 770.0 L657.0 786.0 L649.0 793.0 L612.0 814.0 L608.0 818.0 L599.0 818.0 L592.0 824.0 L585.0 827.0 L571.0 836.0 L567.0 837.0 L564.0 840.0 L550.0 846.0 L542.0 852.0 L531.0 858.0 L511.0 866.0 L507.0 869.0 L504.0 869.0 L498.0 873.0 L495.0 873.0 L488.0 877.0 L477.0 880.0 L467.0 885.0 L454.0 888.0 L437.0 895.0 L423.0 898.0 L420.0 900.0 L398.0 905.0 L395.0 907.0 L391.0 907.0 L383.0 910.0 L375.0 910.0 L371.0 912.0 L360.0 913.0 L356.0 915.0 L350.0 915.0 L349.0 916.0 L342.0 916.0 L335.0 919.0 L321.0 920.0 L311.0 923.0 L301.0 923.0 L300.0 924.0 L291.0 924.0 L290.0 925.0 L270.0 925.0 L269.0 926.0 L240.0 926.0 L232.0 924.0 L224.0 924.0 L218.0 922.0 L207.0 922.0 L201.0 920.0 L182.0 918.0 L167.0 915.0 L164.0 913.0 L161.0 913.0 L139.0 905.0 L109.0 887.0 L96.0 875.0 L90.0 867.0 L88.0 862.0 L80.0 851.0 L76.0 841.0 L65.0 821.0 L63.0 809.0 L61.0 804.0 L61.0 799.0 L57.0 789.0 L57.0 772.0 L56.0 771.0 L55.0 759.0 L56.0 758.0 L57.0 738.0 L64.0 716.0 L68.0 708.0 L68.0 705.0 L72.0 700.0 L73.0 695.0 L77.0 688.0 L83.0 682.0 L92.0 669.0 L99.0 662.0 L110.0 653.0 L117.0 650.0 L124.0 645.0 L128.0 644.0 L135.0 638.0 L140.0 637.0 L158.0 628.0 L170.0 625.0 L176.0 622.0 L179.0 622.0 L184.0 619.0 L194.0 618.0 L198.0 616.0 L226.0 615.0 L227.0 614.0 L251.0 614.0 L252.0 613.0 L299.0 614.0 L300.0 615.0 L321.0 618.0 L344.0 625.0 L355.0 630.0 L357.0 632.0 L372.0 638.0 L405.0 657.0 L429.0 676.0 L432.0 677.0 L447.0 688.0 L452.0 693.0 L464.0 701.0 L470.0 707.0 L481.0 714.0 L498.0 728.0 L524.0 752.0 L536.0 760.0 L561.0 782.0 L577.0 794.0 L599.0 817.0 L608.0 818.0 L612.0 825.0 L616.0 829.0 L636.0 846.0 L694.0 886.0 L701.0 889.0 L717.0 901.0 L730.0 907.0 L733.0 910.0 L747.0 916.0 L756.0 922.0 L763.0 924.0 L765.0 926.0 L768.0 926.0 L779.0 932.0 L794.0 936.0 L796.0 938.0 L804.0 939.0 L807.0 941.0 L811.0 941.0 L837.0 948.0 L846.0 948.0 L847.0 949.0 L889.0 949.0 L890.0 948.0 L913.0 947.0 L921.0 945.0 L924.0 943.0 L931.0 942.0 L937.0 939.0 L947.0 938.0 L962.0 932.0 L969.0 931.0 L978.0 925.0 L983.0 923.0 L988.0 923.0 L992.0 920.0 L994.0 916.0 L998.0 913.0 L1005.0 912.0 L1013.0 908.0 L1016.0 905.0 L1020.0 904.0 L1033.0 896.0 L1039.0 890.0 L1061.0 878.0 L1065.0 874.0 L1079.0 865.0 L1092.0 852.0 L1103.0 844.0 L1115.0 832.0 L1126.0 824.0" pathLength="1" data-len="3320" data-pause="0.35"/>
+          <path class="letter-a" d="M428.0 483.0 L424.0 484.0 L422.0 486.0 L405.0 490.0 L403.0 492.0 L399.0 492.0 L385.0 500.0 L374.0 511.0 L368.0 522.0 L365.0 531.0 L364.0 540.0 L365.0 541.0 L365.0 554.0 L366.0 555.0 L367.0 573.0 L376.0 592.0 L388.0 607.0 L397.0 616.0 L406.0 621.0 L409.0 621.0 L415.0 624.0 L430.0 627.0 L449.0 627.0 L457.0 625.0 L464.0 625.0 L485.0 618.0 L505.0 605.0 L512.0 601.0 L514.0 601.0 L530.0 589.0 L553.0 564.0 L563.0 548.0 L568.0 536.0 L573.0 528.0 L573.0 526.0 L580.0 517.0 L581.0 512.0 L583.0 510.0 L585.0 506.0 L585.0 503.0 L589.0 496.0 L589.0 493.0 L601.0 474.0 L605.0 464.0 L605.0 461.0 L611.0 450.0 L611.0 443.0 L615.0 438.0 L616.0 433.0 L624.0 420.0 L626.0 408.0 L630.0 398.0 L631.0 392.0 L633.0 390.0 L633.0 387.0 L635.0 384.0 L635.0 375.0 L637.0 371.0 L637.0 363.0 L640.0 352.0 L640.0 344.0 L642.0 341.0 L642.0 335.0 L644.0 331.0 L644.0 326.0 L646.0 320.0 L648.0 282.0 L652.0 275.0 L652.0 273.0 L649.0 250.0 L648.0 249.0 L648.0 241.0 L642.0 222.0 L643.0 218.0 L643.0 218.0 L642.0 222.0 L648.0 241.0 L648.0 249.0 L649.0 250.0 L652.0 273.0 L654.0 276.0 L660.0 278.0 L665.0 283.0 L676.0 307.0 L678.0 314.0 L680.0 316.0 L681.0 321.0 L685.0 328.0 L685.0 331.0 L687.0 333.0 L688.0 337.0 L692.0 343.0 L693.0 348.0 L696.0 352.0 L698.0 362.0 L705.0 379.0 L708.0 382.0 L720.0 410.0 L724.0 416.0 L724.0 418.0 L737.0 438.0 L744.0 451.0 L744.0 453.0 L750.0 461.0 L760.0 482.0 L764.0 496.0 L766.0 499.0 L771.0 500.0 L776.0 511.0 L777.0 516.0 L785.0 530.0 L785.0 532.0 L788.0 535.0 L788.0 537.0 L792.0 542.0 L794.0 548.0 L802.0 559.0 L810.0 578.0 L814.0 583.0 L820.0 596.0 L823.0 599.0 L829.0 613.0 L836.0 623.0 L836.0 625.0 L840.0 632.0 L840.0 635.0 L845.0 642.0 L848.0 643.0 L848.0 654.0 L854.0 662.0 L862.0 679.0 L864.0 681.0 L864.0 683.0 L867.0 686.0 L872.0 700.0 L876.0 706.0 L878.0 712.0 L883.0 718.0 L885.0 724.0 L891.0 732.0 L897.0 747.0 L903.0 756.0 L905.0 763.0 L910.0 771.0 L914.0 775.0 L923.0 791.0 L924.0 795.0 L927.0 798.0 L932.0 807.0 L932.0 809.0 L937.0 816.0 L937.0 818.0 L945.0 829.0 L949.0 838.0 L954.0 845.0 L954.0 847.0 L960.0 856.0 L961.0 860.0 L968.0 871.0 L969.0 877.0 L975.0 887.0 L976.0 891.0 L980.0 895.0 L984.0 902.0 L984.0 904.0 L987.0 907.0 L989.0 912.0 L993.0 916.0 L994.0 920.0 L997.0 923.0 L1007.0 941.0 L1028.0 966.0 L1029.0 969.0 L1040.0 983.0 L1070.0 1015.0 L1079.0 1027.0 L1080.0 1030.0 L1093.0 1046.0 L1097.0 1054.0 L1107.0 1066.0" pathLength="1" data-len="1702" data-pause="0.12"/>
+          <path class="letter-a" d="M494.0 496.0 L479.0 478.0 L477.0 472.0 L470.0 460.0 L470.0 457.0 L467.0 453.0 L467.0 449.0 L465.0 446.0 L465.0 441.0 L463.0 436.0 L463.0 416.0 L467.0 411.0 L468.0 406.0 L477.0 391.0 L482.0 386.0 L490.0 381.0 L510.0 375.0 L527.0 375.0 L539.0 378.0 L543.0 381.0 L548.0 382.0 L563.0 393.0 L580.0 410.0 L590.0 426.0 L603.0 440.0 L610.0 442.0 L612.0 452.0 L620.0 454.0 L625.0 457.0 L657.0 481.0 L666.0 486.0 L668.0 486.0 L671.0 489.0 L683.0 494.0 L685.0 496.0 L688.0 496.0 L703.0 501.0 L726.0 502.0 L727.0 503.0 L762.0 502.0 L765.0 500.0 L771.0 500.0 L775.0 497.0 L811.0 488.0 L815.0 485.0 L820.0 485.0 L826.0 481.0 L836.0 477.0 L839.0 474.0 L850.0 468.0 L864.0 457.0 L867.0 456.0 L876.0 448.0 L883.0 445.0 L889.0 439.0 L892.0 438.0 L895.0 435.0 L897.0 435.0 L905.0 428.0 L921.0 419.0 L930.0 411.0" pathLength="1" data-len="638" data-pause="0" data-slow="2.1"/>
+        </svg>
+        <p class="place">Lukas Alexander Anders</p>
+        <p class="place">Rostock, October 2026</p>
+      </div>
+
+      <section class="credits">
+        <h2 id="credits">Credits</h2>
+        <p>This letter tells my story, but it was never mine alone. It was shaped by the people who have been part of my life.</p>
+        <p>My three grandmothers, who taught me to stay curious and showed me that a little quiet goes a long way.</p>
+        <p>My two sisters, who have always been on my side, whatever I was setting out to do next.</p>
+        <p>And my friends, from school, from the physics and from the lab, who shared the good days with me and helped me through the hard ones.</p>
+        <p>Many others have left something with me too: teachers, colleagues and supervisors who shared what they knew and gave me room to try things, and people I met by chance who changed the way I see things.</p>
+        <p>To all of you: thank you. More than I can put into words.</p>
+      </section>
+
+      <section class="contact" aria-label="Contact">
+        <ul>
+          <li><a href="https://www.linkedin.com/in/dr-lukas-anders-65b59211b/">LinkedIn</a></li>
+          <li><a href="mailto:lukas.anders93@gmail.com">Email</a></li>
+          <li><a href="https://doi.org/10.1007/s10311-025-01830-x">Latest first-author paper</a></li>
+        </ul>
+      </section>
+
+      <footer>
+        <a href="impressum.html">Impressum / Legal notice</a> &nbsp;&nbsp; <a href="datenschutz.html">Datenschutz / Privacy</a>
+      </footer>
+    </main>
+
+    <nav class="chapters" aria-label="Chapters">
+      <ol>
+        <li><a href="#top">Early years</a></li>
+        <li><a href="#physics">Studying physics</a></li>
+        <li><a href="#phd">Ship emissions and machine learning</a></li>
+        <li><a href="#ai">Measuring language models</a></li>
+        <li><a href="#music">Six strings</a></li>
+        <li><a href="#next">What comes next</a></li>
+        <li><a href="#credits">Credits</a></li>
+      </ol>
+    </nav>
+  </div>
+
+  <script>
+    // Markiert in der Kapitelübersicht, welches Kapitel gerade gelesen wird
+    const links = [...document.querySelectorAll('nav.chapters a')];
+    const targets = links.map(a => document.querySelector(a.getAttribute('href')));
+    const update = () => {
+      let current = 0;
+      targets.forEach((t, i) => { if (t && t.getBoundingClientRect().top < window.innerHeight * 0.35) current = i; });
+      links.forEach((a, i) => a.setAttribute('aria-current', i === current ? 'true' : 'false'));
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+
+    // Unterschrift: Striche nacheinander zeichnen, sobald das Seitenende erreicht ist
+    const sig = document.querySelector('.signature');
+    if (sig) {
+      const strokes = [...sig.querySelectorAll('path')];
+      const total = strokes.reduce((t, p) => t + +p.dataset.len, 0);
+      const seconds = 3.1;   // reine Schreibzeit für beide Buchstaben, gleichmäßiges Tempo
+      let t = 0;
+      strokes.forEach(p => {
+        const dur = seconds * p.dataset.len / total * (+p.dataset.slow || 1);   // data-slow: Strich langsamer schreiben
+        p.style.setProperty('--delay', t.toFixed(2) + 's');
+        p.style.setProperty('--dur', dur.toFixed(2) + 's');
+        t += dur + +p.dataset.pause;
+      });
+      new IntersectionObserver((entries, obs) => {
+        if (entries[0].isIntersecting) { sig.classList.add('is-written'); obs.disconnect(); }
+      }, { threshold: 0.6 }).observe(sig);
+    }
+
+    // Porträt: einblenden, sobald geladen; danach leichte Parallaxe
+    const fig = document.querySelector('.portrait');
+    const img = fig && fig.querySelector('img');
+    if (img) {
+      const show = () => fig.classList.add('is-loaded');
+      img.complete ? requestAnimationFrame(show) : img.addEventListener('load', show);
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduce) {
+        const parallax = () => {
+          const r = fig.getBoundingClientRect();
+          const progress = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+          fig.style.setProperty('--shift', (progress * -24).toFixed(1) + 'px');
+        };
+        addEventListener('scroll', parallax, { passive: true });
+        parallax();
+
+        // Neigung zum Cursor – nur mit Maus/Trackpad, nicht auf Touch-Geräten
+        if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          const max = 4;   // maximale Neigung in Grad
+          fig.addEventListener('pointermove', e => {
+            const r = fig.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+            fig.classList.add('is-hover');
+            fig.style.setProperty('--ry', ((x - .5) * 2 * max).toFixed(2) + 'deg');
+            fig.style.setProperty('--rx', ((.5 - y) * 2 * max).toFixed(2) + 'deg');
+            fig.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
+            fig.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+          });
+          fig.addEventListener('pointerleave', () => {
+            fig.classList.remove('is-hover');
+            fig.style.setProperty('--rx', '0deg'); fig.style.setProperty('--ry', '0deg');
+          });
+        }
+      }
+    }
+  </script>
+</body>
+</html>
